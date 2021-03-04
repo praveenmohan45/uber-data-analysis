@@ -29,20 +29,30 @@ sep_data=read.csv("uber-raw-data-sep14.csv")
 
 #Splitting the Date.Time column into day,month,year,weekday,hour,minute,second columns
 data_2014 <- rbind(apr_data,may_data, jun_data, jul_data, aug_data, sep_data) #Merging all the datasets to get a big dataframe
+
 data_2014$Date.Time <- as.POSIXct(data_2014$Date.Time, format = "%m/%d/%Y %H:%M:%S") #This is to change the format of Date.time(year-month-date hours:mins:seconds)
+
 data_2014$Time <- format(as.POSIXct(data_2014$Date.Time, format = "%m/%d/%Y %H:%M:%S"), format="%H:%M:%S") #Seperate column for time will be created
+
 data_2014$Date.Time <- ymd_hms(data_2014$Date.Time) #ymd_hms() functions automatically assigns the Universal Coordinated Time Zone (UTC) to the parsed date
+
 data_2014$day <- factor(day(data_2014$Date.Time)) #It extracts and creates a seperate column 'day' indicating the day of that particular month(like 1,2,3,...31)
+
 data_2014$month <- factor(month(data_2014$Date.Time, label = TRUE)) #It extracts and creates a seperate column 'month' indicating the month(like april,may,june etc.)
+
 data_2014$year <- factor(year(data_2014$Date.Time)) #It extracts and creates a seperate column 'year' indicating the year which is 2014 for all the rows since this dataset contains all the trips that were taken in the year 2014
+
 data_2014$dayofweek <- factor(wday(data_2014$Date.Time, label = TRUE)) # #It extracts and creates a seperate column 'dayofweek' which gives the day of that particular date(like Monday,Tuesday...Sunday)
 
 data_2014$hour <- factor(hour(hms(data_2014$Time)))  #It extracts and creates a seperate column 'hour' indicating the hour(time) of the ride taken(suppose if its 11:47AM then its 11 and suppose if 4:20PM then its 16)
+
 data_2014$minute <- factor(minute(hms(data_2014$Time)))  #It extracts and creates a seperate column 'minute' indicating the minute(time) of the ride taken(suppose if its 11:47AM then its 47 and suppose if 4:20PM then its 20)
+
 data_2014$second <- factor(second(hms(data_2014$Time)))  #It extracts and creates a seperate column 'second' indicating the second(time) of the ride taken
 
 #Plotting the trips by the hours in a day
 hour_data <- data_2014 %>% group_by(hour) %>% dplyr::summarize(Total = n()) 
+
 datatable(hour_data) #this gives a table which shows the total no of trips every hour(like 1st hour is 103836(12AM-1AM) and then between 1st hour and 2nd hour(1AM-2AM) is 67227)
 #we can understand how the number of passengers fares throughout the day. We observe that the number of trips are higher in the evening around 5:00 and 6:00 PM.(which is 143213)
 
